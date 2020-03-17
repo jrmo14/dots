@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/backlight_ctrl.dir/backlight_ctrl.cpp.o  -o backlight_ctrl 

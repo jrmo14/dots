@@ -1,0 +1,3 @@
+/home/jrmo/CLionProjects/brightness_tool/build/CMakeFiles/rebuild_cache.dir
+/home/jrmo/CLionProjects/brightness_tool/build/CMakeFiles/backlight_ctrl.dir
+/home/jrmo/CLionProjects/brightness_tool/build/CMakeFiles/edit_cache.dir
