@@ -1,3 +1,3 @@
 [submodule "backlight_ctrl"]
 	path = backlight_ctrl
-	url = ./i3/backlight_ctrl/
+	url = .config/i3/backlight_ctrl/
