@@ -1,8 +1,21 @@
 #!/bin/sh
+if [ -z "$SUDO_USER" ]; then
+  echo "Make sure to pass the -E argument to sudo"
+  exit 1
+fi
+if [ ! -d ~/.config ]; then
+  mkdir ~/.config
+fi
+
+if [ ! -d ~/bin ]; then
+  mkdir ~/bin
+fi
+
 echo "Copying config files"
 cp -r ./config/* ~/.config
 cp -r ./bin/* ~/bin
 cp -r ./home/* ~
+
 echo "Updating base"
 apt update && apt upgrade -y -qq
 echo "Installing required libs and programs"
@@ -17,10 +30,18 @@ apt install -y git build-essential autotools zsh feh openjdk-8-jdk-headless grad
   libnl-genl-3-dev pkg-config rofi ninja-build neovim gdb python3-pip libfreetype6-dev \
   libfontconfig1-dev xclip i3 libxcb-xfixes0-dev network-manager firefox wget htop wireshark thunar -y -qq
 
+pushd config/i3/backlight_ctrl
+echo "Building backlight_ctrl"
+make
+chown root:root backlight_ctrl
+chmod u+s backlight_ctrl
+mv backlight_ctrl ~/bin
+popd
+
 cd ~
 
 echo "Setting shell to zh"
-chsh --shell $(which zsh) $USER
+chsh --shell $(which zsh) $SUDO_USER
 
 echo "Installing oh-my-zsh"
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended --keep-zshrc"
