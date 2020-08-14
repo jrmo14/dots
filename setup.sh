@@ -1,0 +1,119 @@
+#!/bin/sh
+echo "Copying config files"
+cp -r ./config/* ~/.config
+cp -r ./bin/* ~/bin
+cp -r ./home/* ~
+echo "Updating base"
+apt update && apt upgrade -y -qq
+echo "Installing required libs and programs"
+apt install -y git build-essential autotools zsh feh openjdk-8-jdk-headless gradle \
+  curl libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev \
+  libyajl-dev libstartup-notification0-dev libxcb-randr0-dev libev-dev libxcb-cursor-dev \
+  libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev autoconf xutils-dev \
+  libtool automake clang cmake cmake-data pkg-config python3 python3-dev python3-sphinx \
+  libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev \
+  python3-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-xkb-dev \
+  libxcb-xrm-dev libxcb-cursor-dev libasound2-dev libpulse-dev libjsoncpp-dev libcurl4-openssl-dev \
+  libnl-genl-3-dev pkg-config rofi ninja-build neovim gdb python3-pip libfreetype6-dev \
+  libfontconfig1-dev xclip i3 libxcb-xfixes0-dev network-manager firefox wget htop wireshark thunar -y -qq
+
+cd ~
+
+echo "Setting shell to zh"
+chsh --shell $(which zsh) $USER
+
+echo "Installing oh-my-zsh"
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended --keep-zshrc"
+
+echo "Installing Rust"
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+
+echo "Installing Spotify"
+snap install spotify
+echo "Installing Slack"
+snap install slack --classic
+
+if [ ! -d Downloads ]; then
+  mkdir Downloads
+fi
+pushd Downloads
+
+echo "Installing Discord"
+wget -O discord.deb "https://discordapp.com/api/download?platform=linux&format=deb"
+dpkg -i discord.deb
+rm -rf discord.deb
+
+echo "Installing Go"
+wget "https://golang.org/dl/go1.15.linux-amd64.tar.gz"
+tar -C /usr/local -xzf go1.15.linux-amd64.tar.gz
+rm go1.15.linux-amd64.tar.gz
+
+popd
+
+source ~/.pathmod.sh
+
+if [ ! -d git ]; then
+  mkdir git
+fi
+
+pushd git
+
+echo "Building i3-gaps"
+git clone https://github.com/Airblader/i3.git && pushd i3
+git checkout 4.18.2
+git submodule update --init
+autoreconf --force --install
+mkdir build && pushd build
+..configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
+make -j $(nproc)
+make install
+popd && popd
+
+echo "Building Polybar"
+git clone https://github.com/polybar/polybar.git --recursive
+pushd polybar
+mkdir build && pushd build
+cmake -GNinja
+ninja
+ninja install
+popd && popd
+
+echo "Building alacritty"
+git clone https://github.com/alacritty/alacritty.git
+pushd alacritty
+git checkout v0.5.0
+cargo build --release
+cp target/release/alacritty /usr/local/bin
+cp extra/logo/alacritty-term.svg /usr/share/pixmaps/Alacritty.svg
+desktop-file-install extra/linux/Alacritty.desktop
+update-desktop-database
+popd
+
+echo "Removing files"
+rm -rf i3 polybar alacritty
+
+popd
+
+echo "Installing bat, fd-find, ripgrep"
+cargo install bat fd-find ripgrep
+
+echo "Installing python stuff"
+pip3 install numpy thefuck i3ipc python-mpd2 dbus-python ipython
+
+echo "Installing fzf"
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+
+
+echo "Installing vundle"
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+echo "Installing vim plugins"
+vim +PluginInstall +qall
+
+echo "Installing you-Complete-Me"
+pushd ~/.vim/bundle/YouCompleteMe
+python3 install.py --clangd-completer --go-completer --rust-completer --java-completer
+popd
+
+echo "Done"

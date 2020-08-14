@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ENGINE=$(ibus engine)
+if [ $ENGINE = "xkb:us::eng" ]; then
+    ibus engine sunpinyin
+elif [ $ENGINE = "sunpinyin" ]; then
+    ibus engine xkb:us::eng
+else
+    ibus-daemon -d
+fi
