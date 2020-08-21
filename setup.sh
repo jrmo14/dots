@@ -39,14 +39,11 @@ config () {
   fi
 
   echo -e "[${GREEN}+${NC}] ${CYAN}Copying config files${NC}"
-  cp -rT "$WORK_DIR/config/*" $HOME_DIR/.config
-  cp -rT "$WORK_DIR/config/.*" $HOME_DIR/.config
+  cp -rT $WORK_DIR/config/ $HOME_DIR/.config
 
-  cp -rT "$WORK_DIR/bin/*" $HOME_DIR/bin
-  cp -rT "$WORK_DIR/bin/.*" $HOME_DIR/bin
+  cp -rT $WORK_DIR/bin/ $HOME_DIR/bin
 
-  cp -rT "$WORK_DIR/home/*" $HOME_DIR
-  cp -rT "$WORK_DIR/home/.*" $HOME_DIR
+  cp -rT $WORK_DIR/home/ $HOME_DIR
 
   pushd config/i3/backlight_ctrl
   echo -e "[${GREEN}+${NC}] Building backlight_ctrl"
