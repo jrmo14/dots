@@ -45,14 +45,6 @@ config () {
 
   cp -rT $WORK_DIR/home/ $HOME_DIR
 
-  pushd config/i3/backlight_ctrl
-  echo -e "[${GREEN}+${NC}] Building backlight_ctrl"
-  make
-  chown root:root backlight_ctrl
-  chmod u+s backlight_ctrl
-  mv backlight_ctrl $HOME_DIR/bin
-  popd
-
   source $HOME_DIR/.pathmod.sh
 }
 
@@ -60,10 +52,10 @@ updates () {
   cd $WORK_DIR
   dirs -c
 
-  echo -e "[${GREEN}+${NC}] Updating base"
+  echo -e "[${GREEN}+${NC}] ${CYAN} Updating base${NC}"
   apt update && apt upgrade -y -qq
 
-  echo -e "[${GREEN}+${NC}] Installing libraries and programs"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing libraries and programs${NC}"
   apt install -y -qq apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -94,10 +86,10 @@ gui_installs () {
   cd $WORK_DIR
   dirs -c
 
-  echo -e "[${GREEN}+${NC}] Installing Spotify"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Spotify${NC}"
   snap install spotify
 
-  echo -e "[${GREEN}+${NC}] Installing Slack"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Slack${NC}"
   snap install slack --classic
 
   if [ ! -d Downloads ]; then
@@ -105,7 +97,7 @@ gui_installs () {
   fi
   pushd Downloads
 
-  echo -e "[${GREEN}+${NC}] Installing Discord"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Discord${NC}"
   wget -O discord.deb "https://discordapp.com/api/download?platform=linux&format=deb"
   dpkg -i discord.deb
   rm -rf discord.deb
@@ -114,11 +106,11 @@ gui_installs () {
 }
 
 rust_install () {
-  echo -e "[${GREEN}+${NC}] Installing Rust"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Rust${NC}"
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 
-  echo -e "[${GREEN}+${NC}] Installing bat, fd-find, ripgrep"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing bat, fd-find, ripgrep${NC}"
   cargo install bat fd-find ripgrep
 }
 
@@ -132,7 +124,7 @@ source_build () {
 
   pushd git
   echo -e "[${GREEN}*${NC}] ${CYAN}Currently in `pwd`${NC}"
-  echo -e "[${GREEN}+${NC}] Building i3-gaps"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Building i3-gaps${NC}"
   git clone https://github.com/Airblader/i3.git && pushd i3
   git checkout 4.18.2
   git submodule update --init
@@ -143,7 +135,7 @@ source_build () {
   make install
   popd && popd
 
-  echo -e "[${GREEN}+${NC}] Building Polybar"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Building Polybar${NC}"
   git clone https://github.com/polybar/polybar.git --recursive
   pushd polybar
   mkdir build && pushd build
@@ -152,7 +144,7 @@ source_build () {
   ninja install
   popd && popd
 
-  echo -e "[${GREEN}+${NC}] Building alacritty"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Building alacritty${NC}"
   git clone https://github.com/alacritty/alacritty.git
   pushd alacritty
   git checkout v0.5.0
@@ -163,7 +155,7 @@ source_build () {
   update-desktop-database
   popd
 
-  echo -e "[${GREEN}+${NC}] Building picom"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Building picom${NC}"
   git clone https://github.com/yshui/picom.git
   pushd picom
   git checkout v8
@@ -173,29 +165,29 @@ source_build () {
   ninja -C build install
   popd
 
-  echo -e "[${GREEN}+${NC}] Removing files"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
   rm -rf i3 polybar alacritty picom
 
   popd
 }
 
 vim_setup () {
-  echo -e "[${GREEN}+${NC}] [*] Installing vundle"
+  echo -e "[${GREEN}+${NC}] ${CYAN} Installing vundle${NC}"
   git clone https://github.com/VundleVim/Vundle.vim.git $HOME_DIR/.vim/bundle/Vundle.vim
-  echo -e "[${GREEN}+${NC}] [*] Installing vim plugins"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing vim plugins${NC}"
   vim +PluginInstall +qall
 
-  echo -e "[${GREEN}+${NC}] Installing You-Complete-Me"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing You-Complete-Me${NC}"
   pushd $HOME_DIR/.vim/bundle/YouCompleteMe
   python3 install.py --clangd-completer --go-completer --rust-completer --java-completer
   popd
 }
 
 random_tools () {
-  echo -e "[${GREEN}+${NC}] Installing python stuff"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing python stuff${NC}"
   pip3 install numpy thefuck i3ipc python-mpd2 dbus-python ipython pwntools
 
-  echo -e "[${GREEN}+${NC}] Installing fzf"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing fzf${NC}"
   git clone --depth 1 https://github.com/junegunn/fzf.git $HOME_DIR/.fzf
   $HOME_DIR/.fzf/install --all
 }
@@ -213,11 +205,11 @@ random_tools
 vim_setup
 popd
 
-echo -e "[${GREEN}+${NC}] Installing fonts"
+echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
 cd $WORK_DIR
 bash install_fonts.sh
 
-echo -e "[${GREEN}+${NC}] Done"
+echo -e "[${GREEN}+${NC}] ${GREEN}Done${NC}"
 exit 0
 
 
