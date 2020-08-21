@@ -43,7 +43,15 @@ echo "Updating base"
   apt update && apt upgrade -y -qq
 
   echo "Installing libraries and programs"
-  apt install -y git build-essential autotools zsh feh openjdk-8-jdk-headless gradle \
+  apt install -y -qq apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+  add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+  apt update
+
+  apt install -y -qq git build-essential autotools zsh feh openjdk-8-jdk-headless gradle \
     curl libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev \
     libyajl-dev libstartup-notification0-dev libxcb-randr0-dev libev-dev libxcb-cursor-dev \
     libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev autoconf xutils-dev \
@@ -53,7 +61,7 @@ echo "Updating base"
     libxcb-xrm-dev libxcb-cursor-dev libasound2-dev libpulse-dev libjsoncpp-dev libcurl4-openssl-dev \
     libnl-genl-3-dev pkg-config rofi ninja-build neovim gdb python3-pip libfreetype6-dev \
     libfontconfig1-dev xclip i3 libxcb-xfixes0-dev network-manager firefox wget htop wireshark \
-    thunar openssh-server golang neofetch -y -qq
+    thunar openssh-server golang neofetch docker-ce docker-ce-cli containerd.io
 }
 
 gui_installs () {
