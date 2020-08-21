@@ -21,6 +21,14 @@ config () {
     mkdir ~/bin
   fi
 
+  if [ ! -d ~/Documents ]; then
+    mkdir ~/Documents
+  fi
+
+  if [ ! -d ~/Pictures ]; then
+    mkdir ~/Pictures
+  fi
+
   echo "Copying config files"
   cp -r ./config/* ~/.config
   cp -r ./bin/* ~/bin
