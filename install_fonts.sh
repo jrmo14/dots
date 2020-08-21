@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ttyp0_tarball_url='https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/uw-ttyp0-1.3.tar.gz'
 ttyp0_tarball_name='ttyp0.tar.gz'
 ttyp0_folder=`uw-ttyp0-1.3`
