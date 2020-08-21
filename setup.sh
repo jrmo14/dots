@@ -1,60 +1,72 @@
 #!/bin/bash
+RED='\033[0;31m'
+NC='\033[0m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
 if [ -z "$SUDO_USER" ]; then
-  echo "Make sure to pass the -E argument to sudo"
+  echo -e "[${GREEN}+${NC}] ${RED}Make sure to pass the -E argument to sudo${NC}"
   exit 1
 fi
 
+WORK_DIR=$(pwd)
+HOME_DIR="/home/$SUDO_USER"
+
 shell_setup () {
-  echo "Setting shell to zsh"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Setting shell to zsh${NC}"
   chsh --shell $(which zsh) $SUDO_USER
 
-  echo "Installing oh-my-zsh"
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing oh-my-zsh${NC}"
   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended --keep-zshrc"
 }
 
 config () {
-  if [ ! -d ~/.config ]; then
-    mkdir ~/.config
+  cd $WORK_DIR
+  dirs -c
+  if [ ! -d $HOME_DIR/.config ]; then
+    mkdir $HOME_DIR/.config
   fi
 
-  if [ ! -d ~/bin ]; then
-    mkdir ~/bin
+  if [ ! -d $HOME_DIR/bin ]; then
+    mkdir $HOME_DIR/bin
   fi
 
-  if [ ! -d ~/Documents ]; then
-    mkdir ~/Documents
+  if [ ! -d $HOME_DIR/Documents ]; then
+    mkdir $HOME_DIR/Documents
   fi
 
-  if [ ! -d ~/Pictures ]; then
-    mkdir ~/Pictures
+  if [ ! -d $HOME_DIR/Pictures ]; then
+    mkdir $HOME_DIR/Pictures
   fi
 
-  echo "Copying config files"
-  cp -r "./config/*" ~/.config
-  cp -r "./config/.*" ~/.config
+  echo -e "[${GREEN}+${NC}] ${CYAN}Copying config files${NC}"
+  cp -r "$WORK_DIR/config/*" $HOME_DIR/.config
+  cp -r "$WORK_DIR/config/.*" $HOME_DIR/.config
 
-  cp -r "./bin/*" ~/bin
-  cp -r "./bin/.*" ~/bin
+  cp -r "$WORK_DIR/bin/*" $HOME_DIR/bin
+  cp -r "$WORK_DIR/bin/.*" $HOME_DIR/bin
 
-  cp -r "./home/*" ~
-  cp -r "./home/.*" ~
+  cp -r "$WORK_DIR/home/*" $HOME_DIR
+  cp -r "$WORK_DIR/home/.*" $HOME_DIR
 
   pushd config/i3/backlight_ctrl
-  echo "Building backlight_ctrl"
+  echo -e "[${GREEN}+${NC}] Building backlight_ctrl"
   make
   chown root:root backlight_ctrl
   chmod u+s backlight_ctrl
-  mv backlight_ctrl /home/"$SUDO_USER"/bin
+  mv backlight_ctrl $HOME_DIR/bin
   popd
 
-  source /home/"$SUDO_USER"/.pathmod.sh
+  source $HOME_DIR/.pathmod.sh
 }
 
 updates () {
-echo "Updating base"
+  cd $WORK_DIR
+  dirs -c
+
+  echo -e "[${GREEN}+${NC}] Updating base"
   apt update && apt upgrade -y -qq
 
-  echo "Installing libraries and programs"
+  echo -e "[${GREEN}+${NC}] Installing libraries and programs"
   apt install -y -qq apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -82,10 +94,13 @@ echo "Updating base"
 }
 
 gui_installs () {
-  echo "Installing Spotify"
+  cd $WORK_DIR
+  dirs -c
+
+  echo -e "[${GREEN}+${NC}] Installing Spotify"
   snap install spotify
 
-  echo "Installing Slack"
+  echo -e "[${GREEN}+${NC}] Installing Slack"
   snap install slack --classic
 
   if [ ! -d Downloads ]; then
@@ -93,7 +108,7 @@ gui_installs () {
   fi
   pushd Downloads
 
-  echo "Installing Discord"
+  echo -e "[${GREEN}+${NC}] Installing Discord"
   wget -O discord.deb "https://discordapp.com/api/download?platform=linux&format=deb"
   dpkg -i discord.deb
   rm -rf discord.deb
@@ -102,22 +117,25 @@ gui_installs () {
 }
 
 rust_install () {
-  echo "Installing Rust"
+  echo -e "[${GREEN}+${NC}] Installing Rust"
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 
-  echo "Installing bat, fd-find, ripgrep"
+  echo -e "[${GREEN}+${NC}] Installing bat, fd-find, ripgrep"
   cargo install bat fd-find ripgrep
 }
 
 source_build () {
+  cd $HOME_DIR
+  dirs -c
+
   if [ ! -d git ]; then
     mkdir git
   fi
 
   pushd git
-
-  echo "Building i3-gaps"
+  echo -e "[${GREEN}*${NC}] ${CYAN}Currently in `pwd`${NC}"
+  echo -e "[${GREEN}+${NC}] Building i3-gaps"
   git clone https://github.com/Airblader/i3.git && pushd i3
   git checkout 4.18.2
   git submodule update --init
@@ -128,7 +146,7 @@ source_build () {
   make install
   popd && popd
 
-  echo "Building Polybar"
+  echo -e "[${GREEN}+${NC}] Building Polybar"
   git clone https://github.com/polybar/polybar.git --recursive
   pushd polybar
   mkdir build && pushd build
@@ -137,7 +155,7 @@ source_build () {
   ninja install
   popd && popd
 
-  echo "Building alacritty"
+  echo -e "[${GREEN}+${NC}] Building alacritty"
   git clone https://github.com/alacritty/alacritty.git
   pushd alacritty
   git checkout v0.5.0
@@ -148,7 +166,7 @@ source_build () {
   update-desktop-database
   popd
 
-  echo "Building picom"
+  echo -e "[${GREEN}+${NC}] Building picom"
   git clone https://github.com/yshui/picom.git
   pushd picom
   git checkout v8
@@ -158,35 +176,35 @@ source_build () {
   ninja -C build install
   popd
 
-  echo "Removing files"
+  echo -e "[${GREEN}+${NC}] Removing files"
   rm -rf i3 polybar alacritty picom
 
   popd
 }
 
 vim_setup () {
-  echo "Installing vundle"
-  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-  echo "Installing vim plugins"
+  echo -e "[${GREEN}+${NC}] [*] Installing vundle"
+  git clone https://github.com/VundleVim/Vundle.vim.git $HOME_DIR/.vim/bundle/Vundle.vim
+  echo -e "[${GREEN}+${NC}] [*] Installing vim plugins"
   vim +PluginInstall +qall
 
-  echo "Installing You-Complete-Me"
-  pushd ~/.vim/bundle/YouCompleteMe
+  echo -e "[${GREEN}+${NC}] Installing You-Complete-Me"
+  pushd $HOME_DIR/.vim/bundle/YouCompleteMe
   python3 install.py --clangd-completer --go-completer --rust-completer --java-completer
   popd
 }
 
 random_tools () {
-  echo "Installing python stuff"
+  echo -e "[${GREEN}+${NC}] Installing python stuff"
   pip3 install numpy thefuck i3ipc python-mpd2 dbus-python ipython pwntools
 
-  echo "Installing fzf"
-  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-  ~/.fzf/install
+  echo -e "[${GREEN}+${NC}] Installing fzf"
+  git clone --depth 1 https://github.com/junegunn/fzf.git $HOME_DIR/.fzf
+  $HOME_DIR/.fzf/install --all
 }
 
 
-pushd ~
+pushd $HOME_DIR
 
 updates
 config
@@ -198,10 +216,11 @@ random_tools
 vim_setup
 popd
 
-echo "Installing fonts"
+echo -e "[${GREEN}+${NC}] Installing fonts"
+cd $WORK_DIR
 bash install_fonts.sh
 
-echo "Done"
+echo -e "[${GREEN}+${NC}] Done"
 exit 0
 
 
