@@ -184,7 +184,7 @@ vim_setup
 popd
 
 echo "Installing fonts"
-sh install_fonts.sh
+bash install_fonts.sh
 
 echo "Done"
 exit 0
