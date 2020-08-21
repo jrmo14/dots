@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ ! -z "$SUDO_USER" ]; then
+if [ -z "$SUDO_USER" ]; then
   echo "Make sure to pass the -E argument to sudo"
   exit 1
 fi
