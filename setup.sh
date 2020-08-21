@@ -31,9 +31,13 @@ config () {
 
   echo "Copying config files"
   cp -r ./config/* ~/.config
-  cp -r ./bin/* ~/bin
-  cp -r ./home/* ~
+  cp -r ./config/.* ~/.config
 
+  cp -r ./bin/* ~/bin
+  cp -r ./bin/.* ~/bin
+
+  cp -r ./home/* ~
+  cp -r ./home/.* ~
 
   pushd config/i3/backlight_ctrl
   echo "Building backlight_ctrl"
