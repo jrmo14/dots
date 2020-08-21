@@ -30,24 +30,24 @@ config () {
   fi
 
   echo "Copying config files"
-  cp -r ./config/* ~/.config
-  cp -r ./config/.* ~/.config
+  cp -r "./config/*" ~/.config
+  cp -r "./config/.*" ~/.config
 
-  cp -r ./bin/* ~/bin
-  cp -r ./bin/.* ~/bin
+  cp -r "./bin/*" ~/bin
+  cp -r "./bin/.*" ~/bin
 
-  cp -r ./home/* ~
-  cp -r ./home/.* ~
+  cp -r "./home/*" ~
+  cp -r "./home/.*" ~
 
   pushd config/i3/backlight_ctrl
   echo "Building backlight_ctrl"
   make
   chown root:root backlight_ctrl
   chmod u+s backlight_ctrl
-  mv backlight_ctrl ~/bin
+  mv backlight_ctrl /home/"$SUDO_USER"/bin
   popd
 
-  source ~/.pathmod.sh
+  source /home/"$SUDO_USER"/.pathmod.sh
 }
 
 updates () {
@@ -63,7 +63,7 @@ echo "Updating base"
 
   apt update
 
-  apt install -y -qq git build-essential autotools zsh feh openjdk-8-jdk-headless gradle \
+  apt install -y -qq git build-essential autotools-dev zsh feh openjdk-8-jdk-headless gradle \
     curl libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev \
     libyajl-dev libstartup-notification0-dev libxcb-randr0-dev libev-dev libxcb-cursor-dev \
     libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev autoconf xutils-dev \
@@ -71,7 +71,7 @@ echo "Updating base"
     libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev \
     python3-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-xkb-dev \
     libxcb-xrm-dev libxcb-cursor-dev libasound2-dev libpulse-dev libjsoncpp-dev libcurl4-openssl-dev \
-    libnl-genl-3-dev pkg-config rofi ninja-build neovim gdb python3-pip libfreetype6-dev \
+    libnl-genl-3-dev pkg-config rofi ninja-build meson neovim gdb python3-pip libfreetype6-dev \
     libfontconfig1-dev xclip i3 libxcb-xfixes0-dev network-manager firefox wget htop wireshark \
     thunar openssh-server golang neofetch docker-ce docker-ce-cli containerd.io
 }
@@ -142,9 +142,19 @@ source_build () {
   desktop-file-install extra/linux/Alacritty.desktop
   update-desktop-database
   popd
+  
+  echo "Building picom"
+  git clone https://github.com/yshui/picom.git
+  pushd picom
+  git checkout v8
+  git submodule update --init --recursive
+  meson --buildtype=release . build
+  ninja -C build
+  ninja -C build install
+  popd
 
   echo "Removing files"
-  rm -rf i3 polybar alacritty
+  rm -rf i3 polybar alacritty picom
 
   popd
 }

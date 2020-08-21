@@ -2,7 +2,7 @@
 
 # Load Xresources before everything else
 exec_always --no-startup-id xrdb -load ~/.Xresources
-exec_always --no-startup-id compton
+exec_always --no-startup-id picom
 # This might help with a vertical second monitor idk
 # exec_always --no-startup-id ~/.screenlayout/vertical_monitor.sh
 set $mod Mod4
