@@ -12,9 +12,6 @@ export PATH=$PATH:$HOME/bin
 export CUDA_HOME=/usr/local/cuda
 export CU_VERSION=100
 
-export TRELLO_KEY="3071dd333b3d8a1276e30baddaf98726"
-export TRELLO_TOKEN="85d7f373d004404496f3892b9b0d0f87c7f0656d9db6b0e2d63c4ad1c321209a"
-
 # Bring my path into sudo for me
 alias sudo="sudo env \"PATH=$PATH\""
 export FZF_DEFAULT_OPTS="--preview 'bat --color "always" {}' --preview-window=right:60%"
