@@ -73,7 +73,12 @@ echo "Updating base"
     libxcb-xrm-dev libxcb-cursor-dev libasound2-dev libpulse-dev libjsoncpp-dev libcurl4-openssl-dev \
     libnl-genl-3-dev pkg-config rofi ninja-build meson neovim gdb python3-pip libfreetype6-dev \
     libfontconfig1-dev xclip i3 libxcb-xfixes0-dev network-manager firefox wget htop wireshark \
-    thunar openssh-server golang neofetch docker-ce docker-ce-cli containerd.io
+    thunar openssh-server golang neofetch docker-ce docker-ce-cli containerd.io \
+    libxext-dev libxcb1-dev libxcb-damage0-dev libxcb-xfixes0-dev libxcb-shape0-dev \
+    libxcb-render-util0-dev libxcb-render0-dev libxcb-randr0-dev libxcb-composite0-dev \
+    libxcb-image0-dev libxcb-present-dev libxcb-xinerama0-dev libxcb-glx0-dev libpixman-1-dev \
+    libdbus-1-dev libconfig-dev libgl1-mesa-dev  libpcre2-dev  libevdev-dev \
+    uthash-dev libev-dev libx11-xcb-dev
 }
 
 gui_installs () {
@@ -142,7 +147,7 @@ source_build () {
   desktop-file-install extra/linux/Alacritty.desktop
   update-desktop-database
   popd
-  
+
   echo "Building picom"
   git clone https://github.com/yshui/picom.git
   pushd picom
