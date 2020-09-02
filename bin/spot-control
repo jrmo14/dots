@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+import os
+import sys
+import psutil
+# Prioritize mpd
+mpd_running= 'mpd' in [x.name() for x in psutil.process_iter()]
+
+if mpd_running:
+    os.system('dbus-send -print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause')
+
+if sys.argv[1] == 'next':
+    if mpd_running:
+        os.system('mpc next')
+    else:
+        os.system('dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next')
+
+elif sys.argv[1] == 'prev':
+    if mpd_running:
+        os.system('mpc prev')
+    else:
+        os.system('dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous')
+
+elif sys.argv[1] == 'play-pause':
+    if mpd_running:
+        os.system('mpc toggle')
+    else:
+        os.system('dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause')

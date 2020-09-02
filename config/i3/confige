@@ -2,9 +2,7 @@
 
 # Load Xresources before everything else
 exec_always --no-startup-id xrdb -load ~/.Xresources
-exec_always --no-startup-id picom
-# This might help with a vertical second monitor idk
-# exec_always --no-startup-id ~/.screenlayout/vertical_monitor.sh
+exec_always --no-startup-id compton
 set $mod Mod4
 
 # Font for window titles.
@@ -146,6 +144,8 @@ bindsym $mod+Shift+d exec rofi -show drun -display-drun 'Sudo' -run-command 'gks
 -columns 2 -show-icons -icon-theme "Papirus" -theme $HOME/.config/rofi/menu.rasi
 
 
+
+
 ### TERMINAL
 # Start a tiled terminal
 bindsym $mod+Return exec alacritty
@@ -160,7 +160,7 @@ for_window [class="Alacritty" title="floating_term"] floating enable
 ## Set workspace default monitor
 ## Move monitors (Switch if using dGPU)
 bindsym $mod+p move workspace to output DP-3
-bindsym $mod+o move workspace to output eDP-1
+bindsym $mod+o move workspace to output eDP-1-1
 
 # Basic Lock screen right now
 bindsym $mod+shift+x exec screen_lock
@@ -189,15 +189,12 @@ bindsym $mod+shift+Print exec backlight_ctrl -d
 bindsym $mod+shift+Insert exec backlight_ctrl -u
 
 # Screenshot
-bindsym Print exec --no-startup-id flameshot full -c -p ~/Pictures/screenshot
-bindsym shift+Print exec --no-startup-id flameshot gui -p ~/Pictures/screenshot
+bindsym Print exec --no-startup-id scrot '%Y-%m-%d-%s_screenshot_$wx$h.jpg' -e 'mv $f ~/Pictures/screenshot'
+
 #### WALLPAPER
 # exec on start: Set wallpaper everytime i3 starts
-#exec_always --no-startup-id $HOME/.config/i3/scripts/random_wallpaper.sh
-#bindsym $mod+shift+w exec $HOME/.config/i3/scripts/random_wallpaper.sh
-exec_always --no-startup-id nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/flat
-bindsym $mod+shift+w exec nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/flat
-
+exec_always --no-startup-id $HOME/.config/i3/scripts/random_wallpaper.sh
+bindsym $mod+shift+w exec $HOME/.config/i3/scripts/random_wallpaper.sh
 # Dual monitor wallpaper
 #exec_always --no-startup-id feh --bg-scale --no-xinerama $HOME/Pictures/wallpaper/dualmonitor/neon_city.jpg
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
@@ -249,5 +246,3 @@ bindsym $mod+Shift+equal scratchpad show
 # Rename window
 bindsym $mod+shift+n exec i3-msg title_format `zenity --title="i3-msg title_format" --text "Enter a title" --entry)`
 
-# Tab through floating windows
-bindsym $mod+Tab exec --no-startup-id $HOME/.config/i3/scripts/tabbinate_floaters.py
