@@ -3,6 +3,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
+
 if [ -z "$SUDO_USER" ]; then
   echo -e "[${GREEN}+${NC}] ${RED}Make sure to pass the -E argument to sudo${NC}"
   exit 1
@@ -10,6 +11,15 @@ fi
 
 WORK_DIR=$(pwd)
 HOME_DIR="/home/$SUDO_USER"
+
+check_bin_exists() {
+  bin_path=$(which "$1")
+  if [ -x "$bin_path" ]; then
+    return 0
+  else
+    return 1
+  fi
+}
 
 shell_setup () {
   echo -e "[${GREEN}+${NC}] ${CYAN}Setting shell to zsh${NC}"
@@ -64,7 +74,7 @@ updates () {
 
   apt update
 
-  apt install -y -qq git build-essential autotools-dev zsh feh nitrogen openjdk-8-jdk-headless gradle \
+  apt --fix-broken install -y -qq git build-essential autotools-dev zsh feh nitrogen openjdk-8-jdk-headless gradle \
     curl libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev \
     libyajl-dev libstartup-notification0-dev libxcb-randr0-dev libev-dev libxcb-cursor-dev \
     libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev autoconf xutils-dev \
@@ -86,22 +96,36 @@ gui_installs () {
   cd $WORK_DIR
   dirs -c
 
-  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Spotify${NC}"
-  snap install spotify
+  check_bin_exists spotify
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Installing Spotify${NC}"
+    snap install spotify
+  else
+    echo -e "[${GREEN}+${NC}] ${CYAN}Spotify already installed${NC}"
+  fi
 
-  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Slack${NC}"
-  snap install slack --classic
+  check_bin_exists slack
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Installing Slack${NC}"
+    snap install slack --classic
+  else
+    echo -e "[${GREEN}+${NC}] ${CYAN}Slack already installed${NC}"
+  fi
 
   if [ ! -d Downloads ]; then
     mkdir Downloads
   fi
   pushd Downloads
 
-  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Discord${NC}"
-  wget -O discord.deb "https://discordapp.com/api/download?platform=linux&format=deb"
-  dpkg -i discord.deb
-  rm -rf discord.deb
-
+  check_bin_exists discord
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Installing Discord${NC}"
+    wget -O discord.deb "https://discordapp.com/api/download?platform=linux&format=deb"
+    dpkg -i discord.deb
+    rm -rf discord.deb
+  else
+    echo -e "[${GREEN}+${NC}] ${CYAN}Discord already installed${NC}"
+  fi
   popd
 }
 
@@ -124,6 +148,7 @@ source_build () {
 
   pushd git
   echo -e "[${GREEN}*${NC}] ${CYAN}Currently in `pwd`${NC}"
+
   echo -e "[${GREEN}+${NC}] ${CYAN}Building i3-gaps${NC}"
   git clone https://github.com/Airblader/i3.git && pushd i3
   git checkout 4.18.2
@@ -134,39 +159,53 @@ source_build () {
   make -j $(nproc)
   make install
   popd && popd
-
-  echo -e "[${GREEN}+${NC}] ${CYAN}Building Polybar${NC}"
-  git clone https://github.com/polybar/polybar.git --recursive
-  pushd polybar
-  mkdir build && pushd build
-  cmake -GNinja
-  ninja
-  ninja install
-  popd && popd
-
-  echo -e "[${GREEN}+${NC}] ${CYAN}Building alacritty${NC}"
-  git clone https://github.com/alacritty/alacritty.git
-  pushd alacritty
-  git checkout v0.5.0
-  cargo build --release
-  cp target/release/alacritty /usr/local/bin
-  cp extra/logo/alacritty-term.svg /usr/share/pixmaps/Alacritty.svg
-  desktop-file-install extra/linux/Alacritty.desktop
-  update-desktop-database
-  popd
-
-  echo -e "[${GREEN}+${NC}] ${CYAN}Building picom${NC}"
-  git clone https://github.com/yshui/picom.git
-  pushd picom
-  git checkout v8
-  git submodule update --init --recursive
-  meson --buildtype=release . build
-  ninja -C build
-  ninja -C build install
-  popd
-
   echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
-  rm -rf i3 polybar alacritty picom
+  rmdir i3
+
+  check_bin_exists polybar
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Building Polybar${NC}"
+    git clone https://github.com/polybar/polybar.git --recursive
+    pushd polybar
+    mkdir build && pushd build
+    cmake -GNinja
+    ninja
+    ninja install
+    popd && popd
+    echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
+    rmdir polybar
+  fi
+
+  check_bin_exists alacritty
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Building alacritty${NC}"
+    git clone https://github.com/alacritty/alacritty.git
+    pushd alacritty
+    git checkout v0.5.0
+    cargo build --release
+    cp target/release/alacritty /usr/local/bin
+    cp extra/logo/alacritty-term.svg /usr/share/pixmaps/Alacritty.svg
+    desktop-file-install extra/linux/Alacritty.desktop
+    update-desktop-database
+    popd
+    echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
+    rmdir alacritty
+  fi
+
+  check_bin_exists picom
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Building picom${NC}"
+    git clone https://github.com/yshui/picom.git
+    pushd picom
+    git checkout v8
+    git submodule update --init --recursive
+    meson --buildtype=release . build
+    ninja -C build
+    ninja -C build install
+    popd
+    echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
+    rmdir picom
+  fi
 
   popd
 }
@@ -187,9 +226,12 @@ random_tools () {
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing python stuff${NC}"
   pip3 install numpy thefuck i3ipc python-mpd2 dbus-python ipython pwntools
 
-  echo -e "[${GREEN}+${NC}] ${CYAN}Installing fzf${NC}"
-  git clone --depth 1 https://github.com/junegunn/fzf.git $HOME_DIR/.fzf
-  $HOME_DIR/.fzf/install --all
+  check_bin_exists fzf
+  if [ $? -n 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Installing fzf${NC}"
+    git clone --depth 1 https://github.com/junegunn/fzf.git $HOME_DIR/.fzf
+    $HOME_DIR/.fzf/install --all
+  fi
 }
 
 
