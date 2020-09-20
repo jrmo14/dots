@@ -14,6 +14,7 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'dylanaraps/wal.vim'
 Plugin 'flazz/vim-colorschemes'
+Plugin 'philj56/vim-asm-indent'
 
 " Useful autoloads
 Plugin 'xolox/vim-misc'
@@ -24,6 +25,7 @@ Plugin 'valloric/YouCompleteMe'
 Plugin 'rdnetto/YCM-Generator'
 Plugin 'udalov/kotlin-vim'
 Plugin 'lervag/vimtex'
+Plugin 'dart-lang/dart-vim-plugin'
 
 " Spacing and formatting
 Plugin 'Raimondi/delimitMate'
@@ -33,9 +35,6 @@ Plugin 'Yggdroot/indentLine'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
 
-
-" Build
-Plugin 'file:///home/jrmo/.vim/bundle/BuildUp'
 call vundle#end()
 
 filetype plugin indent on
@@ -146,9 +145,6 @@ noremap <F2> :tabe \| :tabm \| :terminal<CR> a
 noremap <F3> :YcmCompleter FixIt<CR>
 " Fix tabs with a keybind
 noremap <F4> mzgg=G`z
-noremap <F9> :wa \| :call BuildUp("")<CR>
-" Shift + <F9>
-noremap <S-F9> :wa \| :call BuildUp("clean")<CR>
 
 " Allow per project config
 set exrc
@@ -158,3 +154,9 @@ set secure
 autocmd BufRead,BufWritePre *.md,*.txt setlocal spell
 autocmd BufRead,BufWritePre *.md, setlocal tabstop=4
 set spellfile=~/.vim/spell/en.utf-8.add
+
+" Treat .rasi as css
+au BufNewFile,BufRead /*.rasi setf css
+
+" Vimwiki config
+let g:vimwiki_list = [{'path': '~/Documents/notes', 'path_html': '~/Documents/export/html'}]

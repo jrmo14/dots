@@ -131,7 +131,7 @@ gui_installs () {
 
 rust_install () {
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing Rust${NC}"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s --default-toolchain stable --profile default --default-host x86_64-unknown-linux-gnu
 
 
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing bat, fd-find, ripgrep${NC}"
