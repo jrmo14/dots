@@ -251,6 +251,9 @@ echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
 cd $WORK_DIR
 bash install_fonts.sh
 
+cd $HOME_DIR
+echo -e "[${GREEN}+${NC}] ${CYAN}Setting owner of all files under $HOME to $SUDO_USER${NC}"
+chown -R $SUDO_USER:$SUDO_USER .
 echo -e "[${GREEN}+${NC}] ${GREEN}Done${NC}"
 exit 0
 
