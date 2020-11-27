@@ -196,8 +196,8 @@ bindsym shift+Print exec --no-startup-id flameshot gui -p ~/Pictures/screenshot
 # exec on start: Set wallpaper everytime i3 starts
 #exec_always --no-startup-id $HOME/.config/i3/scripts/random_wallpaper.sh
 #bindsym $mod+shift+w exec $HOME/.config/i3/scripts/random_wallpaper.sh
-exec_always --no-startup-id nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/flat/
-bindsym $mod+shift+w exec nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/flat
+exec_always --no-startup-id nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/
+bindsym $mod+shift+w exec nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/
 
 # Dual monitor wallpaper
 #exec_always --no-startup-id feh --bg-scale --no-xinerama $HOME/Pictures/wallpaper/dualmonitor/neon_city.jpg

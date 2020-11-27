@@ -48,6 +48,10 @@ config () {
     mkdir $HOME_DIR/Pictures
   fi
 
+  if [ ! -d $HOME_DIR/Pictures/wallpaper/flat ]; then
+    mkdir -p $HOME_DIR/Pictures/wallpaper/
+  fi
+
   echo -e "[${GREEN}+${NC}] ${CYAN}Copying config files${NC}"
   cp -rT $WORK_DIR/config/ $HOME_DIR/.config
 
@@ -224,7 +228,7 @@ vim_setup () {
 
 random_tools () {
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing python stuff${NC}"
-  pip3 install numpy thefuck i3ipc python-mpd2 dbus-python ipython pwntools
+  pip3 install numpy thefuck i3ipc python-mpd2 dbus-python ipython
 
   check_bin_exists fzf
   if [ $? -n 0 ]; then
@@ -232,6 +236,33 @@ random_tools () {
     git clone --depth 1 https://github.com/junegunn/fzf.git $HOME_DIR/.fzf
     $HOME_DIR/.fzf/install --all
   fi
+
+}
+
+
+ctf_tools () {
+  apt install python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential
+  pip3 install pwntools
+  cd $HOME_DIR
+  sh -c "$(curl -fsSL http://gef.blah.cat/sh)"
+
+  # Install Cutter
+  CUTTER_VERSION=$(curl --silent https://api.github.com/repos/radareorg/cutter/releases/latest | rg '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+  mkdir -p $HOME_DIR/.local/share/applications
+  mkdir -p $HOME_DIR/.local/share/Cutter
+  cd $HOME_DIR/.local/share/Cutter
+  wget "https://github.com/radareorg/cutter/releases/download/${CUTTER_VERSION}/Cutter-${CUTTER_VERSION}-x64.Linux.appimage"
+  cat << 'EOF' >> $HOME_DIR/.local/share/applications/Cutter.desktop
+[Desktop Entry]
+Version=${CUTTER_VERSION}
+Type=Application
+Name=Cutter
+Icon=/home/jrmo/.local/share/Cutter/cutter-small.svg
+Exec=/home/jrmo/.local/share/Cutter/Cutter-${CUTTER_VERSION}-x64.Linux.AppImage
+Terminal=false
+Comment=SRE Platform
+Categories=Development;SRE;Tools;Reversing
+EOF
 }
 
 
@@ -244,6 +275,7 @@ gui_installs
 rust_install
 source_build
 random_tools
+ctf_tools
 vim_setup
 popd
 
