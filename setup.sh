@@ -48,8 +48,9 @@ config () {
     mkdir $HOME_DIR/Pictures
   fi
 
-  if [ ! -d $HOME_DIR/Pictures/wallpaper/flat ]; then
+  if [ ! -d $HOME_DIR/Pictures/wallpaper/ ]; then
     mkdir -p $HOME_DIR/Pictures/wallpaper/
+    cp wallpaper/hyalite_reservoir.jpg $HOME_DIR/Pictures/wallpaper
   fi
 
   echo -e "[${GREEN}+${NC}] ${CYAN}Copying config files${NC}"
