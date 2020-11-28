@@ -68,16 +68,18 @@ updates () {
   dirs -c
 
   echo -e "[${GREEN}+${NC}] ${CYAN} Updating base${NC}"
-  apt update && apt upgrade -y -qq
-
+  apt -qq update
+  apt -qq --fix-broken install
+  apt -qq upgrade -y
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing libraries and programs${NC}"
-  apt install -y -qq apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+  apt -qq install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
   add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-  apt update
+
+  apt -qq update
 
   apt --fix-broken install -y -qq git build-essential autotools-dev zsh feh nitrogen openjdk-8-jdk-headless gradle \
     curl libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev \
@@ -139,8 +141,54 @@ rust_install () {
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s --default-toolchain stable --profile default --default-host x86_64-unknown-linux-gnu
 
 
-  echo -e "[${GREEN}+${NC}] ${CYAN}Installing bat, fd-find, ripgrep${NC}"
-  cargo install bat fd-find ripgrep
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing bat, fd-find, ripgrep and alacritty${NC}"
+  cargo install bat fd-find ripgrep alacritty
+}
+
+build_i3 () {
+  cd $HOME_DIR/git
+  echo -e "[${GREEN}+${NC}] ${CYAN}Building i3-gaps${NC}"
+  git clone https://github.com/Airblader/i3.git
+  cd i3
+  git checkout 4.18.2
+  git submodule update --init
+  autoreconf --force --install
+  mkdir build
+  cd build
+  ../configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
+  make -j $(nproc)
+  make install
+  cd ../..
+  echo -e "[${GREEN}+${NC}] ${CYAN}Removing files for i3-gaps${NC}"
+  rmdir i3
+}
+
+build_polybar () {
+  echo -e "[${GREEN}+${NC}] ${CYAN}Building Polybar${NC}"
+  git clone https://github.com/polybar/polybar.git --recursive
+  cd polybar
+  mkdir build
+  cd build
+  cmake -GNinja
+  ninja
+  ninja install
+  cd ../..
+  echo -e "[${GREEN}+${NC}] ${CYAN}Removing files for polybar${NC}"
+  rmdir polybar
+}
+
+build_picom () {
+  echo -e "[${GREEN}+${NC}] ${CYAN}Building picom${NC}"
+  git clone https://github.com/yshui/picom.git
+  cd picom
+  git checkout v8
+  git submodule update --init --recursive
+  meson --buildtype=release . build
+  ninja -C build
+  ninja -C build install
+  cd ..
+  echo -e "[${GREEN}+${NC}] ${CYAN}Removing files for picom${NC}"
+  rmdir picom
 }
 
 source_build () {
@@ -151,68 +199,21 @@ source_build () {
     mkdir git
   fi
 
-  pushd git
-  echo -e "[${GREEN}*${NC}] ${CYAN}Currently in `pwd`${NC}"
+  cd git
 
-  echo -e "[${GREEN}+${NC}] ${CYAN}Building i3-gaps${NC}"
-  git clone https://github.com/Airblader/i3.git && pushd i3
-  git checkout 4.18.2
-  git submodule update --init
-  autoreconf --force --install
-  mkdir build && pushd build
-  ..configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
-  make -j $(nproc)
-  make install
-  popd && popd
-  echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
-  rmdir i3
+  build_i3
 
   check_bin_exists polybar
   if [ $? -ne 0 ]; then
-    echo -e "[${GREEN}+${NC}] ${CYAN}Building Polybar${NC}"
-    git clone https://github.com/polybar/polybar.git --recursive
-    pushd polybar
-    mkdir build && pushd build
-    cmake -GNinja
-    ninja
-    ninja install
-    popd && popd
-    echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
-    rmdir polybar
-  fi
-
-  check_bin_exists alacritty
-  if [ $? -ne 0 ]; then
-    echo -e "[${GREEN}+${NC}] ${CYAN}Building alacritty${NC}"
-    git clone https://github.com/alacritty/alacritty.git
-    pushd alacritty
-    git checkout v0.5.0
-    cargo build --release
-    cp target/release/alacritty /usr/local/bin
-    cp extra/logo/alacritty-term.svg /usr/share/pixmaps/Alacritty.svg
-    desktop-file-install extra/linux/Alacritty.desktop
-    update-desktop-database
-    popd
-    echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
-    rmdir alacritty
+    build_polybar
   fi
 
   check_bin_exists picom
   if [ $? -ne 0 ]; then
-    echo -e "[${GREEN}+${NC}] ${CYAN}Building picom${NC}"
-    git clone https://github.com/yshui/picom.git
-    pushd picom
-    git checkout v8
-    git submodule update --init --recursive
-    meson --buildtype=release . build
-    ninja -C build
-    ninja -C build install
-    popd
-    echo -e "[${GREEN}+${NC}] ${CYAN}Removing files${NC}"
-    rmdir picom
+    build_picom
   fi
 
-  popd
+  cd ..
 }
 
 vim_setup () {
@@ -242,12 +243,15 @@ random_tools () {
 
 
 ctf_tools () {
-  apt install python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing ctf tools${NC}"
+
+  apt install -y -qq python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential
   pip3 install pwntools
   cd $HOME_DIR
   sh -c "$(curl -fsSL http://gef.blah.cat/sh)"
 
   # Install Cutter
+  echo -e "[${GREEN}+${NC}] ${CYAN}Installing Cutter${NC}"
   CUTTER_VERSION=$(curl --silent https://api.github.com/repos/radareorg/cutter/releases/latest | rg '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
   mkdir -p $HOME_DIR/.local/share/applications
   mkdir -p $HOME_DIR/.local/share/Cutter
@@ -280,9 +284,9 @@ ctf_tools
 vim_setup
 popd
 
-echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
-cd $WORK_DIR
-bash install_fonts.sh
+#echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
+#cd $WORK_DIR
+#bash install_fonts.sh
 
 cd $HOME_DIR
 echo -e "[${GREEN}+${NC}] ${CYAN}Setting owner of all files under $HOME to $SUDO_USER${NC}"
