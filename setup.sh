@@ -284,9 +284,9 @@ random_tools
 ctf_tools
 vim_setup
 
-#echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
-#cd $WORK_DIR
-#bash install_fonts.sh
+echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
+cd $WORK_DIR
+source install_fonts.sh
 
 cd $HOME_DIR
 echo -e "[${GREEN}+${NC}] ${CYAN}Setting owner of all files under $HOME to $SUDO_USER${NC}"
