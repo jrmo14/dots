@@ -53,7 +53,7 @@ set cino=N-s
 
 " Pretty colors
 let g:airline_theme = 'base16_nord'
-colorscheme 0x7A69_dark
+silent! colorscheme 0x7A69_dark
 let g:nord_italic=1
 let g:nord_underline=1
 let g:nord_italic_comments=1

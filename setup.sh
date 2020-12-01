@@ -27,6 +27,8 @@ shell_setup () {
 
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing oh-my-zsh${NC}"
   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended --keep-zshrc"
+  mkdir -p $HOME_DIR/.oh-my-zsh/custom/themes
+  cp $WORK_DIR/config/zsh/themes/custom-flazz.zsh-theme $HOME_DIR/.oh-my-zsh/custom/themes
 }
 
 config () {
@@ -122,7 +124,7 @@ gui_installs () {
   if [ ! -d Downloads ]; then
     mkdir Downloads
   fi
-  pushd Downloads
+  cd $HOME_DIR/Downloads
 
   check_bin_exists discord
   if [ $? -ne 0 ]; then
@@ -133,14 +135,14 @@ gui_installs () {
   else
     echo -e "[${GREEN}+${NC}] ${CYAN}Discord already installed${NC}"
   fi
-  popd
 }
 
 rust_install () {
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing Rust${NC}"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s --default-toolchain stable --profile default --default-host x86_64-unknown-linux-gnu
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile default -y
 
-
+  # Source cargo's stuff so we can use it now
+  source $HOME_DIR/.cargo/env
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing bat, fd-find, ripgrep and alacritty${NC}"
   cargo install bat fd-find ripgrep alacritty
 }
@@ -223,9 +225,8 @@ vim_setup () {
   vim +PluginInstall +qall
 
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing You-Complete-Me${NC}"
-  pushd $HOME_DIR/.vim/bundle/YouCompleteMe
+  cd $HOME_DIR/.vim/bundle/YouCompleteMe
   python3 install.py --clangd-completer --go-completer --rust-completer --java-completer
-  popd
 }
 
 random_tools () {
@@ -233,7 +234,7 @@ random_tools () {
   pip3 install numpy thefuck i3ipc python-mpd2 dbus-python ipython
 
   check_bin_exists fzf
-  if [ $? -n 0 ]; then
+  if [ $? -ne 0 ]; then
     echo -e "[${GREEN}+${NC}] ${CYAN}Installing fzf${NC}"
     git clone --depth 1 https://github.com/junegunn/fzf.git $HOME_DIR/.fzf
     $HOME_DIR/.fzf/install --all
@@ -271,7 +272,7 @@ EOF
 }
 
 
-pushd $HOME_DIR
+cd $HOME_DIR
 
 updates
 config
@@ -282,7 +283,6 @@ source_build
 random_tools
 ctf_tools
 vim_setup
-popd
 
 #echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
 #cd $WORK_DIR
