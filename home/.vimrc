@@ -119,6 +119,7 @@ let g:syntastic_java_checkers=[]
 let g:EclimFileTypeValidate=0
 let g:ycm_goto_buffer_command='split'
 nnoremap <C-g> :rightbelow vertical YcmCompleter GoTo<CR>
+set encoding=utf-8
 
 " Dark background
 set background=dark
