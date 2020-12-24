@@ -274,14 +274,14 @@ EOF
 
 cd $HOME_DIR
 
-updates
-config
-shell_setup
-gui_installs
-rust_install
-source_build
-random_tools
-ctf_tools
+updates && \
+config && \
+shell_setup && \
+gui_installs && \
+rust_install && \
+source_build && \
+random_tools && \
+ctf_tools && \
 vim_setup
 
 echo -e "[${GREEN}+${NC}] ${CYAN}Installing fonts${NC}"
