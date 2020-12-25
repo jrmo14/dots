@@ -263,11 +263,11 @@ ctf_tools () {
   wget "https://github.com/radareorg/cutter/releases/download/${CUTTER_VERSION}/Cutter-${CUTTER_VERSION}-x64.Linux.appimage"
   cat << 'EOF' >> $HOME_DIR/.local/share/applications/Cutter.desktop
 [Desktop Entry]
-Version=${CUTTER_VERSION}
+Version=$CUTTER_VERSION
 Type=Application
 Name=Cutter
 Icon=/home/jrmo/.local/share/Cutter/cutter-small.svg
-Exec=/home/jrmo/.local/share/Cutter/Cutter-${CUTTER_VERSION}-x64.Linux.AppImage
+Exec=/home/jrmo/.local/share/Cutter/Cutter-$CUTTER_VERSION-x64.Linux.AppImage
 Terminal=false
 Comment=SRE Platform
 Categories=Development;SRE;Tools;Reversing
