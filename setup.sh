@@ -11,6 +11,8 @@ fi
 
 WORK_DIR=$(pwd)
 HOME_DIR="/home/$SUDO_USER"
+LOG_DIR="$HOME_DIR/logs"
+mkdir $LOG_DIR
 
 check_bin_exists() {
   bin_path=$(which "$1")
@@ -171,9 +173,9 @@ build_polybar () {
   cd polybar
   mkdir build
   cd build
-  cmake -GNinja
-  ninja
-  ninja install
+  cmake -GNinja 2>&1 | tee $LOG_DIR/polybar_cmake.log
+  ninja 2>&1 | tee $LOG_DIR/polybar_ninja.log
+  ninja install 2>&1 | tee $LOG_DIR/polybar_ninja_install.log
   cd ../..
   echo -e "[${GREEN}+${NC}] ${CYAN}Removing files for polybar${NC}"
   rmdir polybar
@@ -186,8 +188,8 @@ build_picom () {
   git checkout v8
   git submodule update --init --recursive
   meson --buildtype=release . build
-  ninja -C build
-  ninja -C build install
+  ninja -C build 2>&1 | tee $LOG_DIR/picom_ninja.log
+  ninja -C build install 2>&1 | tee $LOG_DIR/picom_install.log
   cd ..
   echo -e "[${GREEN}+${NC}] ${CYAN}Removing files for picom${NC}"
   rmdir picom
@@ -246,6 +248,7 @@ random_tools () {
 ctf_tools () {
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing ctf tools${NC}"
 
+  apt -qq --fix-broken install
   apt install -y -qq python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential
   pip3 install pwntools
   cd $HOME_DIR
