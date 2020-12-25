@@ -73,7 +73,7 @@ updates () {
 
   echo -e "[${GREEN}+${NC}] ${CYAN} Updating base${NC}"
   apt -qq update
-  apt -qq --fix-broken install
+  apt -qq --fix-broken install -y
   apt -qq upgrade -y
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing libraries and programs${NC}"
   apt -qq install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
@@ -173,7 +173,7 @@ build_polybar () {
   cd polybar
   mkdir build
   cd build
-  cmake -GNinja 2>&1 | tee $LOG_DIR/polybar_cmake.log
+  cmake -GNinja .. 2>&1 | tee $LOG_DIR/polybar_cmake.log
   ninja 2>&1 | tee $LOG_DIR/polybar_ninja.log
   ninja install 2>&1 | tee $LOG_DIR/polybar_ninja_install.log
   cd ../..
@@ -248,7 +248,7 @@ random_tools () {
 ctf_tools () {
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing ctf tools${NC}"
 
-  apt -qq --fix-broken install
+  apt -qq --fix-broken install -y
   apt install -y -qq python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential
   pip3 install pwntools
   cd $HOME_DIR
