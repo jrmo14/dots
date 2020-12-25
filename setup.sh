@@ -64,6 +64,10 @@ config () {
 
   cp -rT $WORK_DIR/home/ $HOME_DIR
 
+  if [ ! -d $HOME_DIR/.config/gtk-3.0 ]; then
+    mkdir $HOME_DIR/.config/gtk-3.0
+  fi
+
   source $HOME_DIR/.pathmod.sh
 }
 
@@ -100,7 +104,7 @@ updates () {
     libxcb-render-util0-dev libxcb-render0-dev libxcb-randr0-dev libxcb-composite0-dev \
     libxcb-image0-dev libxcb-present-dev libxcb-xinerama0-dev libxcb-glx0-dev libpixman-1-dev \
     libdbus-1-dev libconfig-dev libgl1-mesa-dev  libpcre2-dev  libevdev-dev \
-    uthash-dev libev-dev libx11-xcb-dev
+    uthash-dev libev-dev libx11-xcb-dev snapd yaru-theme-gtk yaru-theme-icon
 }
 
 gui_installs () {
@@ -122,6 +126,34 @@ gui_installs () {
   else
     echo -e "[${GREEN}+${NC}] ${CYAN}Slack already installed${NC}"
   fi
+
+  check_bin_exists chromium
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Installing Chromium${NC}"
+    snap install chromium
+  else
+    echo -e "[${GREEN}+${NC}] ${CYAN}Chromium Already installed${NC}"
+  fi
+
+  check_bin_exists clion
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Installing Clion${NC}"
+    snap install clion --classic
+  else
+    echo -e "[${GREEN}+${NC}] ${CYAN}Clion Already installed${NC}"
+  fi
+
+  check_bin_exists clion
+  if [ $? -ne 0 ]; then
+    echo -e "[${GREEN}+${NC}] ${CYAN}Installing Intellij${NC}"
+    snap install intellij-idea-ultimate --classic
+  else
+    echo -e "[${GREEN}+${NC}] ${CYAN}Intellij Already installed${NC}"
+  fi
+
+
+
+
 
   if [ ! -d Downloads ]; then
     mkdir Downloads
@@ -256,30 +288,33 @@ ctf_tools () {
 
   # Install Cutter
   echo -e "[${GREEN}+${NC}] ${CYAN}Installing Cutter${NC}"
-  CUTTER_VERSION=$(curl --silent https://api.github.com/repos/radareorg/cutter/releases/latest | rg '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+  CUTTER_VERSION=$(curl --silent https://api.github.com/repos/rizinorg/cutter/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
   mkdir -p $HOME_DIR/.local/share/applications
   mkdir -p $HOME_DIR/.local/share/Cutter
   cd $HOME_DIR/.local/share/Cutter
-  wget "https://github.com/radareorg/cutter/releases/download/${CUTTER_VERSION}/Cutter-${CUTTER_VERSION}-x64.Linux.appimage"
+  wget "https://github.com/rizinorg/cutter/releases/download/${CUTTER_VERSION}/Cutter-${CUTTER_VERSION}-x64.Linux.appimage"
+
   cat << 'EOF' >> $HOME_DIR/.local/share/applications/Cutter.desktop
 [Desktop Entry]
-Version=$CUTTER_VERSION
+Version=VERSION
 Type=Application
 Name=Cutter
 Icon=/home/jrmo/.local/share/Cutter/cutter-small.svg
-Exec=/home/jrmo/.local/share/Cutter/Cutter-$CUTTER_VERSION-x64.Linux.AppImage
+Exec=/home/jrmo/.local/share/Cutter/Cutter-VERSION-x64.Linux.appimage
 Terminal=false
 Comment=SRE Platform
 Categories=Development;SRE;Tools;Reversing
 EOF
-}
 
+  sed -i "s/VERSION/$CUTTER_VERSION/g" $HOME_DIR/.local/share/applications/Cutter.desktop
+
+}
 
 cd $HOME_DIR
 
 updates && \
-config && \
 shell_setup && \
+config && \
 gui_installs && \
 rust_install && \
 source_build && \
