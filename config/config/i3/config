@@ -1,0 +1,263 @@
+# Please see http://i3wm.org/docs/userguide.html for a complete reference
+
+# Load Xresources before everything else
+exec_always --no-startup-id xrdb -load ~/.Xresources
+# Start compositor
+exec_always --no-startup-id picom
+# Stop mulitple instances of redshift from running
+exec_always --no-startup-id "killall redshift; redshift"
+# Setup swipe gestures
+exec_always --no-startup-id "killall fusuma; fusuma"
+
+# This might help with a vertical second monitor idk
+# exec_always --no-startup-id ~/.screenlayout/vertical_monitor.sh
+set $mod Mod4
+
+# Font for window titles.
+#font pango:Ttyp0 Regular 11
+font pango:JetBrainsMono Nerd Font Regular 9
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+
+#### BASIC USAGE
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# change focus
+bindsym $mod+j focus left
+bindsym $mod+k focus down
+bindsym $mod+l focus up
+bindsym $mod+semicolon focus right
+# alternatively, you can use the cursor keys:
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move focused window
+bindsym $mod+Shift+j move left
+bindsym $mod+Shift+k move down
+bindsym $mod+Shift+l move up
+bindsym $mod+Shift+semicolon move right
+# alternatively, you can use the cursor keys:
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# split in horizontal orientation
+bindsym $mod+h split h
+# split in vertical orientation
+bindsym $mod+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (tabbed, toggle split)
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+
+# Alias the workspace names so its easier to change
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# switch to workspace
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# Exit i3 (& the x session)
+#bindsym $mod+Shift+e exec i3-exit
+#
+mode "Resize" {
+        set $resize_amnt 5
+        # These bindings trigger as soon as you enter the resize mode
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym j resize shrink width $resize_amnt px or $resize_amnt ppt
+        bindsym k resize grow height $resize_amnt px or $resize_amnt ppt
+        bindsym l resize shrink height $resize_amnt px or $resize_amnt ppt
+        bindsym semicolon resize grow width $resize_amnt px or $resize_amnt ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width $resize_amnt px or $resize_amnt ppt
+        bindsym Down resize grow height $resize_amnt px or $resize_amnt ppt
+        bindsym Up resize shrink height $resize_amnt px or $resize_amnt ppt
+        bindsym Right resize grow width $resize_amnt px or $resize_amnt ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+bindsym $mod+r mode "Resize"
+
+# Hide the edge borders
+hide_edge_borders both
+for_window [class="^.*"] border pixel 2
+
+# Use rofi to make an appmenu/searchbar
+bindsym $mod+d exec rofi -show drun -display-drun "apps" -display-ssh "ssh"\
+-bw 0 -lines 10 -line-padding 10 -padding 20 -width 30 -xoffset 8 -yoffset 32 -location 1\
+-columns 2 -show-icons -icon-theme "Papirus" -theme $HOME/.config/rofi/menu.rasi
+
+# Allow rofi to run programs as sudo
+#bindsym $mod+Shift+d exec rofi -show drun -display-drun 'Sudo' -run-command 'gksudo -k {cmd}'\
+#-bw 0 -lines 10 -line-padding 10 -padding 20 -width 30 -xoffset 8 -yoffset 32 -location 1\
+#-columns 2 -show-icons -icon-theme "Papirus" -theme $HOME/.config/rofi/menu.rasi
+bindsym $mod+Shift+d exec $HOME/.config/polybar/scripts/documents.sh
+
+
+### TERMINAL
+# Start a tiled terminal
+bindsym $mod+Return exec alacritty
+# Start a floating terminal
+bindsym $mod+Shift+Return exec ~/bin/random_floating_term.py
+# Filter and make sure that the terminal is floating
+for_window [class="Alacritty" title="floating_term"] floating enable
+
+
+
+### Monitor stuff
+## Set workspace default monitor
+## Move monitors (Switch if using dGPU)
+bindsym $mod+p move workspace to output right
+bindsym $mod+o move workspace to output left
+
+# Basic Lock screen right now
+bindsym $mod+shift+x exec screen_lock
+
+
+##### FUNCTION KEYS
+# Pulse Audio controls
+exec --no-startup-id volume-control 35%
+bindsym XF86AudioRaiseVolume exec --no-startup-id volume-control +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec --no-startup-id volume-control -5% #decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id volume-control m # mute sound
+bindsym $mod+F12 exec --no-startup-id volume-control +5% #increase sound volume
+bindsym $mod+F11 exec --no-startup-id volume-control -5% #decrease sound volume
+bindsym $mod+F10 exec --no-startup-id volume-control m # mute sound
+exec_always --no-startup-id mkfifo /tmp/xobvolpipe
+exec_always --no-startup-id tail -f /tmp/xobvolpipe | xob -s volume
+
+# Media player controls
+bindsym XF86AudioNext exec spot-control next
+bindsym $mod+F9 exec spot-control next
+bindsym XF86AudioPrev exec spot-control prev
+bindsym $mod+F7 exec spot-control prev
+bindsym XF86AudioPlay exec spot-control play-pause
+bindsym $mod+F8 exec spot-control play-pause
+
+# Brightness controls
+bindsym $mod+shift+F11 exec backlight_ctrl -d
+bindsym $mod+shift+F12 exec backlight_ctrl -u
+exec_always --no-startup-id tail -f /tmp/xobbacklightpipe | xob -s brightness -m 120000
+
+# Screenshot
+bindsym Print exec --no-startup-id flameshot full -c -p ~/Pictures/screenshot
+bindsym shift+Print exec --no-startup-id flameshot gui -p ~/Pictures/screenshot
+#### WALLPAPER
+# exec on start: Set wallpaper everytime i3 starts
+exec_always --no-startup-id $HOME/.config/i3/scripts/random_wallpaper.sh
+bindsym $mod+shift+w exec $HOME/.config/i3/scripts/random_wallpaper.sh
+#exec_always --no-startup-id nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/flat/
+#bindsym $mod+shift+w exec nitrogen --set-zoom-fill --random $HOME/Pictures/wallpaper/flat
+
+# Dual monitor wallpaper
+#exec_always --no-startup-id feh --bg-scale --no-xinerama $HOME/Pictures/wallpaper/dualmonitor/neon_city.jpg
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+#### GAPS
+gaps inner 15
+gaps outer 5
+bindsym $mod+t gaps inner current set 0; gaps outer current set 0
+bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 5
+bindsym $mod+y gaps inner current plus 5; gaps outer current plus 5
+bindsym $mod+Shift+y gaps inner current minus 5
+
+#### LANGUAGE SWITCHER
+# Language engine switch
+bindsym $mod+m exec kb_switch
+
+#### RANDOM WINDOW MANIPULATION
+# Projects
+for_window [class="com.jrmo.*"] floating enable, border normal
+
+# Start Virtualbox as a floating window
+for_window [class="VirtualBox Manager"] floating enable, border normal
+# Hide the VM pane
+for_window [class="VirtualBoxVM"] move scratchpad
+for_window [class="VirtualBox Machine"] move to workspace $ws8, fullscreen enable
+
+# Float jetbrains ide startup windows
+for_window [title="win0"] floating enable, border pixel 2
+no_focus [title="win0"]
+
+# Float matlab figures
+for_window [title="Figure*"] floating enable, border normal
+no_focus [title="Figure*"]
+
+# Start popups as floating
+for_window [window_role="pop-up"] floating enable
+for_window [class="java-lang-Thread"] floating enable
+for_window [window_role="gnome-calculator"] floating enable
+
+# Move apps to certain workspaces
+for_window [class="Spotify"] move to workspace $ws10
+assign [class="Slack"] $ws9
+assign [class="discord"] $ws9
+
+# for hiding windows
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+Shift+equal scratchpad show
+
+# Rename window
+bindsym $mod+shift+n exec i3-msg title_format `zenity --title="i3-msg title_format" --text "Enter a title" --entry)`
+
+# Tab through floating windows
+bindsym $mod+Tab exec --no-startup-id $HOME/.config/i3/scripts/tab_cycle.py

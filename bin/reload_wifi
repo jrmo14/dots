@@ -1,4 +1,0 @@
-#!/bin/bash
-NETWORK=$(nmcli con show --active | grep wifi | cut -d" " -f 1)
-nmcli connection down $NETWORK
-nmcli connection up $NETWORK

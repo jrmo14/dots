@@ -1,7 +1,0 @@
-#!/bin/bash
-if [ $# -eq 0 ]; then
-  echo "give a markdown file"
-else
-  name=$(echo $1 | rev | cut -d. -f2-  | rev)
-  pandoc $1 -f markdown --latex-engine=xelatex -o $name".pdf"
-fi
