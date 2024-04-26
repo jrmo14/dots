@@ -1,0 +1,35 @@
+[language-server]
+ruff = {command = "ruff-lsp"}
+pest-language-server = {command = "pest-language-server"}
+clangd = {command = "clangd-16"}
+tabby = {command = "tabby-ls", args = ["-l", "python", "-c", "localhost"]}
+ols = {command = "ols"}
+
+[[language]]
+name = "pest"
+scope = "source.pest"
+file-types = ["pest"]
+roots = []
+comment-token = "//"
+language-servers = [ "pest-language-server" ]
+
+[language.auto-pairs]
+'(' = ')'
+'{' = '}'
+'[' = ']'
+'"' = '"'
+
+[[language]]
+name = "python"
+formatter = {command = "black", args=["-"]}
+language-servers = ["pylsp", "ruff"]
+
+[[language]]
+name = "go"
+formatter = {command = "gofmt"}
+
+
+[[language]]
+name = "odin"
+formatter = {command = "odinfmt", args = ["-stdin", "true"]}
+language-servers = ["ols"]

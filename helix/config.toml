@@ -1,0 +1,48 @@
+theme = "onedark"
+
+[editor]
+cursorline = true
+line-number = "relative"
+idle-timeout = 40
+gutters = ["diagnostics", "diff", "line-numbers", "spacer"]
+rulers = [100]
+true-color = true
+mouse = false
+
+
+[editor.cursor-shape]
+insert = "bar"
+select = "block"
+normal = "underline"
+
+
+[editor.statusline]
+left=  ["mode", "spinner", "version-control"]
+center = ["file-base-name", "file-modification-indicator"]
+right = ["diagnostics", "selections", "position", "file-type"]
+separator = "|"
+
+[editor.indent-guides]
+render = true
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+
+[editor.soft-wrap]
+enable = true
+
+[keys.normal]
+C-u = ["half_page_up", "goto_window_center"]
+C-d = ["half_page_down", "goto_window_center"]
+C-b = ["page_up", "goto_window_center"]
+C-f = ["page_down", "goto_window_center"]
+X = "extend_line_above"
+
+
+[keys.normal.space]
+f = "file_picker_in_current_directory"
+F = "file_picker"
+"space" = "goto_last_accessed_file"
+h  =":toggle lsp.display-inlay-hints"
