@@ -1,0 +1,37 @@
+#!/bin/bash
+
+proj=$(basename $(pwd))
+sessions=$(tmux ls | cut -d: -f1)
+
+projActive () {
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && return 0; done
+  return 1
+}
+
+POETRY_PROJECT=0
+
+if [ -z "$TMUX" ]; then
+  projActive $proj $sessions
+  if [[ $? -eq 1 ]]; then
+    tmux new -s $proj -n editor -d -x "$(tput cols)" -y "$(tput lines)"
+    editor_str="hx"
+    if [ -f pyproject.toml ]; then
+      if grep -q "tool.poetry" pyproject.toml; then
+        editor_str="poetry run ${editor_str}"
+        POETRY_PROJECT=1
+      fi
+    fi
+    tmux send "${editor_str}" C-m
+    tmux new-window -n shell
+    if [ $POETRY_PROJECT -eq 1 ]; then
+      tmux send "poetry shell" C-m
+    fi
+    tmux select-window -t 0
+    tmux select-pane -t 0
+  fi
+  tmux a -t $proj
+else
+  echo "Already in TMUX session"
+fi
